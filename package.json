@@ -1,6 +1,6 @@
 {
   "name": "minicoro.c",
-  "version": "1.2024.12",
+  "version": "1.2024.14",
   "description": "Single header stackful cross-platform coroutine library in pure C; Eduardo Bart (2021).",
   "keywords": [
     "c",
@@ -18,6 +18,10 @@
     "type": "git",
     "url": "git+https://github.com/nodef/minicoro.c.git"
   },
-  "license": "CC0-1.0",
-  "main": "minicoro.h"
+  "license": "UNLICENSED",
+  "author": "wolfram77@gmail.com",
+  "main": "minicoro.h",
+  "scripts": {
+    "test": "bash build.sh test"
+  }
 }

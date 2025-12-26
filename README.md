@@ -8,19 +8,53 @@ for the [Nelua](https://github.com/edubart/nelua-lang) programming language.
 
 The library assembly implementation is inspired by [Lua Coco](https://coco.luajit.org/index.html) by Mike Pall.
 
-# Installation
+<br>
+
+## Installation
 
 Run:
-```bash
+
+```sh
 $ npm i minicoro.c
 ```
 
 And then include `minicoro.h` as follows:
+
 ```c
+// main.c
+#define MINICORO_IMPL  // or MINICORO_IMPLEMENTATION
 #include "node_modules/minicoro.c/minicoro.h"
+
+int main() { /* ... */ }
 ```
 
-# Features
+And then compile with `clang` or `gcc` as usual.
+
+```bash
+$ clang main.c  # or, use gcc
+$ gcc   main.c
+```
+
+You may also use a simpler approach:
+
+```c
+// main.c
+#define MINICORO_IMPL  // or MINICORO_IMPLEMENTATION
+#include <minicoro.h>
+
+int main() { /* ... */ }
+```
+
+If you add the path `node_modules/minicoro.c` to your compiler's include paths.
+
+```bash
+$ clang -I./node_modules/minicoro.c main.c  # or, use gcc
+$ gcc   -I./node_modules/minicoro.c main.c
+```
+
+<br>
+
+## Features
 
 - Stackful asymmetric coroutines.
 - Supports nesting coroutines (resuming a coroutine from another coroutine).
@@ -40,7 +74,9 @@ And then include `minicoro.h` as follows:
 - Error prone API, returning proper error codes on misuse.
 - Support running with Valgrind, ASan (AddressSanitizer) and TSan (ThreadSanitizer).
 
-# Supported Platforms
+<br>
+
+## Supported Platforms
 
 Most platforms are supported through different methods:
 
@@ -61,7 +97,9 @@ otherwise ucontext or fiber method is used as a fallback.
 The assembly method is very efficient, it just take a few cycles
 to create, resume, yield or destroy a coroutine.
 
-# Caveats
+<br>
+
+## Caveats
 
 - Avoid using coroutines with C++ exceptions, this is not recommended, it may not behave as you expect.
 - When using C++ RAII (i.e. destructors) you must resume the coroutine until it dies to properly execute all destructors.
@@ -77,7 +115,9 @@ you may want to do this only to use minicoro with WebAssembly native interpreter
 (no Web browser). This method is confirmed to work well with Emscripten toolchain,
 however it fails on other WebAssembly toolchains like WASI SDK.
 
-# Introduction
+<br>
+
+## Introduction
 
 A coroutine represents an independent "green" thread of execution.
 Unlike threads in multithread systems, however,
@@ -104,7 +144,9 @@ you can optionally use `mco_push` and `mco_pop` APIs,
 they are intended to pass temporary values using a LIFO style buffer.
 The storage system can also be used to send and receive initial values on coroutine creation or before it finishes.
 
-# Usage
+<br>
+
+## Usage
 
 To use minicoro, do the following in one .c file:
 
@@ -115,7 +157,7 @@ To use minicoro, do the following in one .c file:
 
 You can do `#include "minicoro.h"` in other parts of the program just like any other header.
 
-## Minimal Example
+### Minimal Example
 
 The following simple example demonstrates on how to use the library:
 
@@ -164,13 +206,13 @@ _NOTE_: In case you don't want to use the minicoro allocator system you should
 allocate a coroutine object yourself using `mco_desc.coro_size` and call `mco_init`,
 then later to destroy call `mco_uninit` and deallocate it.
 
-## Yielding from anywhere
+### Yielding from anywhere
 
 You can yield the current running coroutine from anywhere
 without having to pass `mco_coro` pointers around,
 to this just use `mco_yield(mco_running())`.
 
-## Passing data between yield and resume
+### Passing data between yield and resume
 
 The library has the storage interface to assist passing data between yield and resume.
 It's usage is straightforward,
@@ -179,12 +221,12 @@ then later use `mco_pop` after a `mco_resume` or `mco_yield` to receive data.
 Take care to not mismatch a push and pop, otherwise these functions will return
 an error.
 
-## Error handling
+### Error handling
 
 The library return error codes in most of its API in case of misuse or system error,
 the user is encouraged to handle them properly.
 
-## Virtual memory backed allocator
+### Virtual memory backed allocator
 
 The new compile time option `MCO_USE_VMEM_ALLOCATOR` enables a virtual memory backed allocator.
 
@@ -223,7 +265,7 @@ This option may add an order of magnitude overhead to `mco_create()`/`mco_destro
 because they will request the OS to manage virtual memory page tables,
 if this is a problem for you, please customize a custom allocator for your own needs.
 
-## Library customization
+### Library customization
 
 The following can be defined to change the library behavior:
 
@@ -245,7 +287,9 @@ The following can be defined to change the library behavior:
 - `MCO_USE_ASYNCIFY`          - Force use of Binaryen asyncify context switch implementation.
 - `MCO_USE_VALGRIND`          - Define if you want run with valgrind to fix accessing memory errors.
 
-# Benchmarks
+<br>
+
+## Benchmarks
 
 The coroutine library was benchmarked for x86_64 counting CPU cycles
 for context switch (triggered in resume or yield) and initialization.
@@ -259,7 +303,9 @@ for context switch (triggered in resume or yield) and initialization.
 
 _NOTE_: Tested on Intel Core i7-8750H CPU @ 2.20GHz with pre allocated coroutines.
 
-# Cheatsheet
+<br>
+
+## Cheatsheet
 
 Here is a list of all library functions for quick reference:
 
@@ -301,7 +347,9 @@ mco_coro* mco_running(void);                        /* Returns the running corou
 const char* mco_result_description(mco_result res); /* Get the description of a result. */
 ```
 
-# Complete Example
+<br>
+
+## Complete Example
 
 The following is a more complete example, generating Fibonacci numbers:
 
@@ -380,7 +428,9 @@ int main() {
 }
 ```
 
-# Updates
+<br>
+
+## Updates
 
 - **15-Nov-2023**: Introduce `MCO_USE_VMEM_ALLOCATOR` option for allocating thousands of coroutines with low memory footprint, this include breaking changes in the allocator API.
 - **7-Jan-2023**: Fix 128-bit XMM registers not being fully saved on Windows.
@@ -403,12 +453,16 @@ int main() {
 - **10-Jan-2021**: Minor API improvements and document more.
 - **09-Jan-2021**: Library created.
 
-# Donation
+<br>
+
+## Donation
 
 I'm a full-time open source developer, any amount of the donation through my GitHub will be appreciated and could bring me encouragement to keep supporting this and other open source projects.
 I may accept one-time sponsorships for small features or minor enhancements aligned with the project goals, in this case contact me.
 
-# License
+<br>
+
+## License
 
 Your choice of either Public Domain or MIT No Attribution, see LICENSE file.
 
@@ -416,6 +470,6 @@ Your choice of either Public Domain or MIT No Attribution, see LICENSE file.
 <br>
 
 
+[![SRC](https://img.shields.io/badge/src-repo-green?logo=Org)](https://github.com/edubart/minicoro)
 [![ORG](https://img.shields.io/badge/org-nodef-green?logo=Org)](https://nodef.github.io)
 ![](https://ga-beacon.deno.dev/G-RC63DPBH3P:SH3Eq-NoQ9mwgYeHWxu7cw/github.com/nodef/minicoro.c)
-[![SRC](https://img.shields.io/badge/src-repo-green?logo=Org)](https://github.com/edubart/minicoro)
