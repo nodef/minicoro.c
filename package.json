@@ -1,6 +1,6 @@
 {
   "name": "minicoro.c",
-  "version": "1.2024.14",
+  "version": "1.2024.15",
   "description": "Single header stackful cross-platform coroutine library in pure C; Eduardo Bart (2021).",
   "keywords": [
     "c",
